@@ -1,7 +1,7 @@
 import boto3
 import json
 import zipfile
-from io import BytesIO
+from io import StringIO
 import io
 import mimetypes
 
@@ -25,8 +25,8 @@ def lambda_handler(event, context):
         for artifact in job['data']['inputArtifacts']:
           if artifact['name'] == 'BuildArtifact':
             location = artifact['location']['s3Location']
-            
-      print('location: ' + location['bucketName'] + '/' + location['bucketName'])
+      
+      print('location: ' + location['bucketName'] + '/' + location['objectKey'])
       
       src = s3.Bucket(location['bucketName'])
       dest = s3.Bucket('awsome.education')
@@ -46,7 +46,7 @@ def lambda_handler(event, context):
 
       print('response: ' + response)
 
-    except:
+    except Exception as error:
       
       topic.publish(Subject='extract-and-deploy FAILED', Message='Failed deployment') # TODO more info
       response = 'n/a'
@@ -59,5 +59,5 @@ def lambda_handler(event, context):
           }
         )
 
-      print('response: ' + response)
+      print('response: ' + str(response))
       raise
